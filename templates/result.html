@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Generated Questions - Questify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>{{ college_name }}</h2>
+            <h4>{{ subject }} - Generated Questions</h4>
+        </div>
+        <div>
+            <a href="{{ url_for('download_pdf') }}" class="btn btn-danger">Download PDF</a>
+            <a href="{{ url_for('download_docx') }}" class="btn btn-primary">Download DOCX</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if questions %}
+                <ul class="list-group list-group-flush">
+                    {% for q in questions %}
+                        <li class="list-group-item">
+                            <strong>Q{{ loop.index }}.</strong> {{ q }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-center">No questions were generated. Please go back and try again.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">← Back to Dashboard</a>
+    </div>
+</div>
+{% endblock %}

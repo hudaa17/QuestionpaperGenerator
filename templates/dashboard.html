@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Questify{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="p-5 text-center bg-body-tertiary rounded-3">
+        <h1 class="text-body-emphasis">Welcome, {{ name }}!</h1>
+        <p class="col-lg-8 mx-auto fs-5 text-muted">
+            Ready to create a new question paper? Upload your PDF source material and let our AI do the heavy lifting.
+        </p>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Create Question Paper</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="college_name" class="form-label">College/Institution Name</label>
+                        <input type="text" class="form-control" id="college_name" name="college_name" value="Questify University" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="subject" class="form-label">Subject Name</label>
+                        <input type="text" class="form-control" id="subject" name="subject" value="Artificial Intelligence" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="pdf" class="form-label">Upload PDF Material</label>
+                        <input class="form-control" type="file" id="pdf" name="pdf" accept=".pdf" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="logo" class="form-label">Upload Institution Logo (Optional)</label>
+                        <input class="form-control" type="file" id="logo" name="logo" accept="image/*">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="num_questions" class="form-label">Number of Questions</label>
+                        <input type="number" class="form-control" id="num_questions" name="num_questions" value="10" min="1" max="20" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="difficulty" class="form-label">Difficulty Level (for guidance)</label>
+                        <select class="form-select" id="difficulty" name="difficulty">
+                            <option value="L1" selected>L1 - Easy</option>
+                            <option value="L2">L2 - Medium</option>
+                            <option value="L3">L3 - Hard</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Generate Questions</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
