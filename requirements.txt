@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Werkzeug
+python-dotenv
+requests
+Authlib
+PyMuPDF
+fpdf2
+python-docx
