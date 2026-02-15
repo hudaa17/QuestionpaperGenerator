@@ -1,64 +1,137 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Questify{% endblock %}
-
 {% block content %}
-<div class="container my-5">
-    <div class="p-5 text-center bg-body-tertiary rounded-3">
-        <h1 class="text-body-emphasis">Welcome, {{ name }}!</h1>
-        <p class="col-lg-8 mx-auto fs-5 text-muted">
-            Ready to create a new question paper? Upload your PDF source material and let our AI do the heavy lifting.
-        </p>
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    
+    <!-- Header -->
+    <div class="mb-10">
+        <h1 class="text-3xl font-bold text-slate-900">Create New Paper</h1>
+        <p class="text-slate-500 mt-2">Upload your study material and let AI generate the questions.</p>
     </div>
 
-    <div class="card mt-4">
-        <div class="card-header">
-            <h3>Create Question Paper</h3>
-        </div>
-        <div class="card-body">
-            <form method="POST" enctype="multipart/form-data">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="college_name" class="form-label">College/Institution Name</label>
-                        <input type="text" class="form-control" id="college_name" name="college_name" value="Questify University" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="subject" class="form-label">Subject Name</label>
-                        <input type="text" class="form-control" id="subject" name="subject" value="Artificial Intelligence" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="pdf" class="form-label">Upload PDF Material</label>
-                        <input class="form-control" type="file" id="pdf" name="pdf" accept=".pdf" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="logo" class="form-label">Upload Institution Logo (Optional)</label>
-                        <input class="form-control" type="file" id="logo" name="logo" accept="image/*">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Main Form -->
+        <div class="lg:col-span-2">
+            <form id="generateForm" method="POST" enctype="multipart/form-data" class="bg-white p-8 rounded-2xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-slate-100 space-y-6">
+                
+                <!-- File Upload -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Upload PDF Material</label>
+                    <div class="relative border-2 border-dashed border-slate-300 rounded-2xl p-10 text-center hover:bg-indigo-50/30 hover:border-indigo-400 transition-all duration-300 group cursor-pointer">
+                        <input type="file" name="pdf" accept=".pdf" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div class="space-y-2">
+                            <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto group-hover:scale-110 group-hover:bg-indigo-100 transition duration-300 shadow-sm">
+                                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                            </div>
+                            <p class="text-sm text-slate-600 font-medium">Click to upload or drag and drop</p>
+                            <p class="text-xs text-slate-400">PDF files only (Max 10MB)</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="num_questions" class="form-label">Number of Questions</label>
-                        <input type="number" class="form-control" id="num_questions" name="num_questions" value="10" min="1" max="20" required>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Subject Name</label>
+                        <input type="text" name="subject" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition bg-slate-50 focus:bg-white" placeholder="e.g. Machine Learning">
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="difficulty" class="form-label">Difficulty Level (for guidance)</label>
-                        <select class="form-select" id="difficulty" name="difficulty">
-                            <option value="L1" selected>L1 - Easy</option>
-                            <option value="L2">L2 - Medium</option>
-                            <option value="L3">L3 - Hard</option>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">College Name</label>
+                        <input type="text" name="college_name" required class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition bg-slate-50 focus:bg-white" placeholder="e.g. Tech University">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Difficulty Level</label>
+                        <select name="difficulty" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none bg-slate-50 focus:bg-white transition">
+                            <option value="L1">L1 - Remember & Understand</option>
+                            <option value="L2">L2 - Apply & Analyze</option>
+                            <option value="L3">L3 - Evaluate & Create</option>
                         </select>
                     </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Number of Questions</label>
+                        <input type="number" name="num_questions" value="10" min="1" max="20" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition bg-slate-50 focus:bg-white">
+                    </div>
                 </div>
 
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-primary btn-lg">Generate Questions</button>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1">College Logo (Optional)</label>
+                    <input type="file" name="logo" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition cursor-pointer">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Questions
+                    </button>
                 </div>
             </form>
         </div>
+
+        <!-- Sidebar Info -->
+        <div class="space-y-6">
+            <div class="bg-indigo-900 text-white p-8 rounded-2xl shadow-xl shadow-indigo-900/20 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-info"></i> Bloom's Taxonomy
+                </h3>
+                <div class="space-y-4 text-indigo-100 text-sm">
+                    <div>
+                        <span class="font-bold text-white block">L1: Remember & Understand</span>
+                        <p>Basic recall of facts and concepts.</p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-white block">L2: Apply & Analyze</span>
+                        <p>Using information in new situations.</p>
+                    </div>
+                    <div>
+                        <span class="font-bold text-white block">L3: Evaluate & Create</span>
+                        <p>Justifying a stand or creating new work.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center">
+    <div class="relative">
+        <!-- Spinner -->
+        <div class="w-24 h-24 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+        <!-- Icon in center -->
+        <div class="absolute inset-0 flex items-center justify-center text-indigo-600">
+            <i class="fa-solid fa-brain text-2xl animate-pulse"></i>
+        </div>
+    </div>
+    <h3 class="mt-8 text-xl font-bold text-slate-800" id="loadingText">Analyzing Document...</h3>
+    <p class="text-slate-500 mt-2 text-sm">This usually takes about 10-15 seconds</p>
+</div>
+
+<script>
+    const form = document.getElementById('generateForm');
+    const overlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    
+    const messages = [
+        "Extracting text from PDF...",
+        "Applying Bloom's Taxonomy...",
+        "Generating Questions...",
+        "Formatting Final Paper..."
+    ];
+
+    form.addEventListener('submit', function() {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        
+        let i = 0;
+        setInterval(() => {
+            if(i < messages.length) {
+                loadingText.textContent = messages[i];
+                i++;
+            }
+        }, 2500);
+    });
+</script>
 {% endblock %}

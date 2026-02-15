@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative overflow-hidden bg-white pt-16 pb-32">
+    <!-- Background decoration -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
+        <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-indigo-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+        <div class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-50/50 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-medium mb-8 border border-indigo-100 opacity-0 animate-fade-in-up">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            AI-Powered Question Paper Generator
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight mb-6 opacity-0 animate-fade-in-up delay-100">
+            Professional <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Question Papers</span> in Seconds
+        </h1>
+        <p class="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed opacity-0 animate-fade-in-up delay-200">
+            Upload your study material, select Bloom's Taxonomy levels, and let AI generate professional question papers instantly.
+        </p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 opacity-0 animate-fade-in-up delay-300">
+            <a href="{{ url_for('signup') }}" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold px-8 py-4 rounded-xl shadow-xl shadow-indigo-500/20 transition transform hover:-translate-y-1">
+                Get Started for Free
+            </a>
+            <a href="#features" class="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-lg font-semibold px-8 py-4 rounded-xl transition">
+                Learn More
+            </a>
+        </div>
+        
+        <!-- Visual Representation -->
+        <div class="mt-20 relative mx-auto max-w-5xl perspective-1000 opacity-0 animate-fade-in-up delay-300">
+            <div class="rotate-3d transition-transform duration-700 hover:transform-none">
+                <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-2">
+                    <div class="bg-slate-50 rounded-xl overflow-hidden relative border border-slate-100">
+                        <!-- Mock Browser Header -->
+                        <div class="h-10 bg-white border-b border-slate-200 flex items-center px-4 gap-2">
+                            <div class="flex gap-1.5">
+                                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                <div class="w-3 h-3 rounded-full bg-amber-400"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                            </div>
+                            <div class="ml-4 bg-slate-100 px-3 py-1 rounded-md text-xs text-slate-400 flex-grow text-center font-mono">questify.ai/dashboard</div>
+                        </div>
+                        <!-- Mock Content -->
+                        <div class="p-8 grid grid-cols-3 gap-6 min-h-[400px]">
+                            <div class="col-span-2 space-y-4">
+                                <div class="h-32 bg-white border-2 border-dashed border-indigo-200 rounded-xl flex flex-col items-center justify-center text-indigo-400">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2"></i>
+                                    <span class="text-sm font-medium">Upload PDF</span>
+                                </div>
+                                <div class="h-12 bg-white border border-slate-200 rounded-lg w-full"></div>
+                                <div class="h-12 bg-white border border-slate-200 rounded-lg w-full"></div>
+                                <div class="h-12 bg-indigo-600 rounded-lg w-full shadow-lg shadow-indigo-200"></div>
+                            </div>
+                            <div class="col-span-1 bg-indigo-900 rounded-xl p-4 space-y-3 opacity-90">
+                                <div class="h-4 bg-white/20 rounded w-1/2"></div>
+                                <div class="h-20 bg-white/10 rounded w-full"></div>
+                                <div class="h-20 bg-white/10 rounded w-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div id="features" class="py-24 bg-slate-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-slate-900">Everything you need to set papers</h2>
+            <p class="text-slate-500 mt-4 max-w-2xl mx-auto">Stop spending hours formatting Word documents. Questify handles the heavy lifting.</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-file-pdf"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Smart PDF Parsing</h3>
+                <p class="text-slate-500 leading-relaxed">Upload any textbook chapter, notes, or syllabus PDF. Our AI extracts key concepts instantly.</p>
+            </div>
+            
+            <!-- Feature 2 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                <div class="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Bloom's Taxonomy</h3>
+                <p class="text-slate-500 leading-relaxed">Generate questions aligned with L1 (Remember), L2 (Apply), and L3 (Create) cognitive levels.</p>
+            </div>
+            
+            <!-- Feature 3 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition group">
+                <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-download"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900 mb-3">Export to Word & PDF</h3>
+                <p class="text-slate-500 leading-relaxed">Download perfectly formatted question papers with your college logo and header ready to print.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="py-24 bg-white">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-indigo-900 rounded-3xl p-12 text-center relative overflow-hidden shadow-2xl">
+            <div class="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+            
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 relative z-10">Ready to transform your workflow?</h2>
+            <p class="text-indigo-200 mb-10 max-w-2xl mx-auto relative z-10">Join thousands of educators who are saving time and improving assessment quality with Questify.</p>
+            <a href="{{ url_for('signup') }}" class="inline-block bg-white text-indigo-900 font-bold text-lg px-8 py-4 rounded-xl hover:bg-indigo-50 transition relative z-10 shadow-lg">
+                Start Generating Now
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

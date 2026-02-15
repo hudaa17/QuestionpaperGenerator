@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, flash
 import os
-import io, time, logging
+import io, time, logging, uuid
+import json
+from datetime import datetime
 import re
 import fitz
 from fpdf import FPDF
@@ -13,6 +15,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 import requests
+from authlib.integrations.flask_client import OAuth
 
 # ---------------- Load Environment ----------------
 load_dotenv()
@@ -29,8 +32,10 @@ app = Flask(__name__)
 
 # --- App Configuration ---
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "a-very-secret-key-that-you-should-change")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///questify.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["GOOGLE_CLIENT_ID"] = os.getenv("GOOGLE_CLIENT_ID")
+app.config["GOOGLE_CLIENT_SECRET"] = os.getenv("GOOGLE_CLIENT_SECRET")
 
 UPLOAD_FOLDER = "uploads"
 LOGO_FOLDER = "static/logos"
@@ -42,6 +47,16 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
+
+# --- OAuth Setup ---
+oauth = OAuth(app)
+google = oauth.register(
+    name='google',
+    client_id=app.config["GOOGLE_CLIENT_ID"],
+    client_secret=app.config["GOOGLE_CLIENT_SECRET"],
+    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
+    client_kwargs={'scope': 'openid email profile'}
+)
 
 # --- Utilities ---
 logging.basicConfig(level=logging.INFO)
@@ -59,6 +74,15 @@ class User(UserMixin, db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class Paper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    subject = db.Column(db.String(200))
+    college_name = db.Column(db.String(200))
+    questions_json = db.Column(db.Text)  # Store questions as a JSON string
+    logo_path = db.Column(db.String(300))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 
@@ -124,7 +148,7 @@ NO EXCEPTIONS.
 Do NOT output incomplete tags like "(L" or "( L".
 
 ### TEXT:
-{text[:2500]}
+{text[:15000]}
 """
 
         headers = {
@@ -166,7 +190,9 @@ Do NOT output incomplete tags like "(L" or "( L".
 # ---------------- Routes ----------------
 @app.route("/")
 def index():
-    return redirect(url_for("dashboard"))
+    if current_user.is_authenticated:
+        return redirect(url_for("dashboard"))
+    return render_template("landing.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -185,6 +211,44 @@ def login():
 
     return render_template("login.html")
 
+@app.route('/login/google')
+def google_login():
+    if not app.config["GOOGLE_CLIENT_ID"] or not app.config["GOOGLE_CLIENT_SECRET"]:
+        flash("Google Login is not configured on the server.")
+        return redirect(url_for('login'))
+    redirect_uri = url_for('google_authorize', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/callback')
+def google_authorize():
+    try:
+        token = google.authorize_access_token()
+        user_info = token.get('userinfo')
+        if not user_info:
+            user_info = google.get('https://openidconnect.googleapis.com/v1/userinfo').json()
+        
+        email = user_info['email']
+        name = user_info.get('name', email.split('@')[0])
+
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            # Create a new user for Google login
+            # We generate a random password since they use Google to login
+            random_password = str(uuid.uuid4())
+            new_user = User(
+                email=email,
+                name=name,
+                password=generate_password_hash(random_password, method="pbkdf2:sha256")
+            )
+            db.session.add(new_user)
+            db.session.commit()
+            user = new_user
+        
+        login_user(user)
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        flash(f"Google Login failed: {str(e)}")
+        return redirect(url_for('login'))
 
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
@@ -249,6 +313,17 @@ def dashboard():
         text = extract_text_from_pdf(path)
         questions = generate_ai_questions(text, num_questions, difficulty)
 
+        # Save to Database (History)
+        new_paper = Paper(
+            user_id=current_user.id,
+            subject=subject,
+            college_name=college_name,
+            questions_json=json.dumps(questions),
+            logo_path=logo_path
+        )
+        db.session.add(new_paper)
+        db.session.commit()
+
         session["questions"] = questions
         session["subject"] = subject
         session["college_name"] = college_name
@@ -262,11 +337,52 @@ def dashboard():
 @app.route("/questions")
 @login_required
 def show_questions():
+    logo_path = session.get("logo_path")
+    if logo_path:
+        logo_path = logo_path.replace("\\", "/")
+        if not logo_path.startswith("/"):
+            logo_path = "/" + logo_path
+
     return render_template("result.html",
                            questions=session.get("questions", []),
                            subject=session.get("subject", "Subject"),
-                           college_name=session.get("college_name", "College"))
+                           college_name=session.get("college_name", "College"),
+                           logo_path=logo_path)
 
+
+@app.route("/history")
+@login_required
+def history():
+    papers = Paper.query.filter_by(user_id=current_user.id).order_by(Paper.created_at.desc()).all()
+    return render_template("history.html", papers=papers)
+
+
+@app.route("/load_paper/<int:paper_id>")
+@login_required
+def load_paper(paper_id):
+    paper = Paper.query.get_or_404(paper_id)
+    if paper.user_id != current_user.id:
+        flash("Unauthorized access.")
+        return redirect(url_for("dashboard"))
+    
+    session["questions"] = json.loads(paper.questions_json)
+    session["subject"] = paper.subject
+    session["college_name"] = paper.college_name
+    session["logo_path"] = paper.logo_path
+    return redirect(url_for("show_questions"))
+
+@app.route("/delete_paper/<int:paper_id>", methods=["POST"])
+@login_required
+def delete_paper(paper_id):
+    paper = Paper.query.get_or_404(paper_id)
+    if paper.user_id != current_user.id:
+        flash("Unauthorized access.")
+        return redirect(url_for("history"))
+    
+    db.session.delete(paper)
+    db.session.commit()
+    flash("Paper deleted successfully.")
+    return redirect(url_for("history"))
 
 @app.route("/download_pdf")
 @login_required
