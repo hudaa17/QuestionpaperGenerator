@@ -8,3 +8,7 @@ venv/
 .vscode/
 __pycache__/
 .DS_Store
+*.db
+*.sqlite
+uploads/
+static/logos/
